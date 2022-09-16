@@ -1,0 +1,51 @@
+﻿<Window 
+    x:Class="OLEDSaver.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:OLEDSaver"
+    xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+    mc:Ignorable="d"
+    Height="450" 
+    Width="150"
+    MinWidth="150"
+    Background="#222"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource UiWindow}"
+>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <wpfui:TitleBar 
+            Name="RootTitleBar" 
+            Grid.Row="0" 
+            ApplicationNavigation="True" 
+            ShowMaximize="False" 
+            MinimizeToTray="True" 
+            UseNotifyIcon="True"
+            NotifyIconImage="Assets/display_icon.ico"
+            NotifyIconClick="RootTitleBar_NotifyIconClick"
+        />
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <Slider Name="OpacitySlider" Value="0.5" Height="200" Width="10" Orientation="Vertical" ValueChanged="OpacitySlider_ValueChanged" Margin="50" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="15">
+                <Button Name="ReloadButton" Content="Reload" Padding="5" Width="100" Click="ReloadButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
