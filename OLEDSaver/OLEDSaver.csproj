@@ -14,8 +14,10 @@
     <Resource Include="Assets\display_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Windows.User32" Version="0.11.29" />
+    <PackageReference Include="Dapplo.Windows.User32" Version="1.0.28" />
+    <PackageReference Include="Keypress" Version="2.0.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="MouseKeyHook" Version="5.7.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
       <PrivateAssets>all</PrivateAssets>

@@ -22,6 +22,8 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Interop;
 using System.Drawing;
+using Gma.System.MouseKeyHook;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace OLEDSaver
 {
@@ -35,6 +37,7 @@ namespace OLEDSaver
         int TitleHeight;
         bool TitleEnabled = false;
         const float DefaultOpacity = 0.5f;
+        HotKeyTools HotKeys;
 
         public MainWindow()
         {
@@ -51,6 +54,8 @@ namespace OLEDSaver
             Top = bounds.Y + (bounds.Height / scale) - Height;
 
             ShowInTaskbar = false;
+
+            LoadKeyHooks();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -130,6 +135,36 @@ namespace OLEDSaver
             //CreateTitleForm();
         }
 
+        void LoadKeyHooks()
+        {
+            string keyFile = System.IO.Path.Join(Environment.CurrentDirectory, "keys.json").ToString();
+            if (!File.Exists(keyFile))
+            {
+                FormTools.ShowSelectableMessageBox(
+                    keyFile,
+                    "No keys.config found",
+                    "HotKey config file does not exist. Generating example here:"
+                );
+
+                var tmpHotKeys = new HotKeyTools();
+                tmpHotKeys.HotKeys = new HotKey[]
+                {
+                    new HotKey() { KeyString = "Oemtilde", ModifiersString = "Alt, Shift", Reload = true },
+                    new HotKey() { KeyString = "D1", ModifiersString = "Alt, Shift", Brightness = 0.0f },
+                    new HotKey() { KeyString = "D2", ModifiersString = "Alt, Shift", Brightness = 0.5f },
+                    new HotKey() { KeyString = "D3", ModifiersString = "Alt, Shift", Brightness = 0.75f },
+                    new HotKey() { KeyString = "D4", ModifiersString = "Alt, Shift", Brightness = 1.0f },
+                };
+                File.WriteAllText(keyFile, tmpHotKeys.Serialize());
+            }
+
+            HotKeys = HotKeyTools.LoadFromFile("keys.json");
+            HotKeys.BrightnessChanged += ChangeBrightness;
+            HotKeys.Reload += () => { ReloadButton_Click(null, null); };
+        }
+
+
+
         void ApplyHiddenForm(Form form, WinDraw.Rectangle bounds)
         {
             form.BackColor = WinDraw.Color.Black;
@@ -139,8 +174,8 @@ namespace OLEDSaver
             form.TopLevel = true;
             form.ShowInTaskbar = false;
 
-            long initialStyle = User32Api.GetWindowLongWrapper(form.Handle, WindowLongIndex.GWL_EXSTYLE);
-            User32Api.SetWindowLongWrapper(form.Handle, WindowLongIndex.GWL_EXSTYLE, (IntPtr)(initialStyle | 0x80000 | 0x20));
+            IntPtr initialStyle = User32Api.GetWindowLongWrapper(form.Handle, WindowLongIndex.GWL_EXSTYLE);
+            User32Api.SetWindowLongWrapper(form.Handle, WindowLongIndex.GWL_EXSTYLE, (IntPtr)((long)initialStyle | 0x80000 | 0x20));
 
             form.SetBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height);
         }
@@ -252,9 +287,19 @@ namespace OLEDSaver
         }
         private void UpdateOpacity()
         {
+            ChangeOpacity(1.0f - (float)OpacitySlider.Value / 10.0f);
+        }
+
+        private void ChangeBrightness(float brightness)
+        {
+            //ChangeOpacity(1.0f - brightness);
+            OpacitySlider.Value = brightness * 10.0f;
+        }
+        private void ChangeOpacity(float opacity)
+        {
             foreach (var form in Overlays)
             {
-                form.Opacity = Math.Min(1.0f - OpacitySlider.Value / 10.0f, 0.95f);
+                form.Opacity = Math.Min(opacity, 0.95f);
             }
         }
 
